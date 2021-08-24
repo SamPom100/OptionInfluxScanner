@@ -1,21 +1,35 @@
 import yfinance as yf
 import pandas as pd
 import matplotlib.pyplot as plt
+pd.set_option('display.max_rows', None)
 
 ticker = yf.Ticker("MSFT")
 
-#get options
-#print(ticker.options)
-#print(ticker.option_chain("2021-09-17"))
+#get option dates
+optionChain = ticker.options
+for date in optionChain:
+    pass
 
-#TODO get 10 most active options
-data = yf.download(['MSFT210917C00260000'])
-data1 = data.drop(["Open","High","Low","Adj Close", "Volume"], axis=1)
-data2 = data.drop(["Open","High","Low","Adj Close", "Close"], axis=1)
+#get top 10 volume options for single date
+optionStrikes = ticker.option_chain(optionChain[10])
+calls = optionStrikes.calls.nlargest(10, 'volume')
+calls = calls.drop(["volume","lastTradeDate","strike","lastPrice","bid","ask","openInterest","impliedVolatility","inTheMoney","contractSize","currency","change","percentChange"],axis=1)
 
-#TODO overlay both graphs
-data1.plot()
-data2.plot()
+#column of DataFrame into list
+callsList = []
+for x in calls.values.tolist():
+    callsList.append(x[0])
 
-plt.show()
-print("done")
+def singleData(optionID):
+    data = yf.download([optionID])
+    data = data.drop(["Open", "High", "Low", "Close", "Adj Close"], axis=1)
+    return data
+
+#get single option data
+for id in callsList:
+    temp = singleData(id)
+    temp.plot()
+    plt.show()
+    plt.clf()
+
+
