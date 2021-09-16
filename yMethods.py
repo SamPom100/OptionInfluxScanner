@@ -38,3 +38,6 @@ for x in range(len(optionChain)):
     print(frame)
     frame.plot()
     plt.show()
+    plt.clf()
+    plt.cla()
+    plt.close()
